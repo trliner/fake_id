@@ -26,6 +26,10 @@ module FakeId
         def #{column_name}=(id_sym)
           self.#{column_id} = self.class.fake_id_mappings[:#{column_name}].invert[id_sym]
         end
+
+        def self.#{column_name.to_s.pluralize}
+          self.fake_id_mappings[:#{column_name}].values
+        end
       EVAL
 
     end

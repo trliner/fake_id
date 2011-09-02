@@ -6,10 +6,10 @@ http://github.com/trliner/fake_id
 
 === Defining fake ids
 
-  class SecretAgentAlias
+  class SecretAgentAlias < ActiveRecord::Base
     include FakeId
 
-    attr_accessor :document_type_id
+    attr_accessible :document_type_id
 
     fake_ids_for :document_type, {
       :drivers_license => 1,
@@ -18,9 +18,14 @@ http://github.com/trliner/fake_id
   end
 
 
+=== Generated class methods
+
+  SecretAgentAlias.document_types
+  => [:drivers_license, :passport]
+
 === Generated instance methods
 
-  alias = Alias.new(:document_type_id = 1)
+  alias = SecretAgentAlias.new(:document_type_id = 1)
   alias.document_type
   => :drivers_license
 
