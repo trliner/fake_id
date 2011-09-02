@@ -20,10 +20,10 @@ http://github.com/trliner/fake_id
 
 === Generated instance methods
 
-  alias_1 = Alias.new(:document_type_id = 1)
-  alias_1.document_type
+  alias = Alias.new(:document_type_id = 1)
+  alias.document_type
   => :drivers_license
 
-  alias_2 = Alias.new(:document_type_id = 2)
-  alias_2.document_type
+  alias.document_type = :passport
+  alias.document_type
   => :passport
