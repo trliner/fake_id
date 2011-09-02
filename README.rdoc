@@ -50,3 +50,13 @@ http://github.com/trliner/fake_id
 
   SecretAgentAlias.lookup_document_type(:passport)
   => 1
+
+
+=== Generated named scopes
+
+  SecretAgentAlias.drivers_license
+  SecretAgentAlias.not_passport
+  SecretAgentAlias.document_type_is(:drivers_license)
+  SecretAgentAlias.document_type_is_not(:passport)
+  SecretAgentAlias.document_type_in(:drivers_license, :passport)
+  SecretAgentAlias.document_type_not_in(:drivers_license, :passport)

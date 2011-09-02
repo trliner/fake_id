@@ -15,14 +15,17 @@ module FakeId
       write_inheritable_attribute(:fake_id_mappings, {}) if fake_id_mappings.nil?
       fake_id_mappings[column_name] ||= {}
 
-      id_mapping.each do |name, id|
-        fake_id_mappings[column_name][id] = name
+      id_mapping.each do |id_sym, id|
+        fake_id_mappings[column_name][id] = id_sym
 
         class_eval <<-EVAL
-          def #{name}?
+          def #{id_sym}?
             self.#{column_id} == id
           end
-          alias :#{name} :#{name}?
+          alias :#{id_sym} :#{id_sym}?
+
+          named_scope :#{id_sym}, :conditions => "#{column_id} = #{id}"
+          named_scope :not_#{id_sym}, :conditions => "#{column_id} <> #{id}"
         EVAL
       end
 
@@ -43,6 +46,10 @@ module FakeId
           end
         end
 
+        def self.#{column_id}s_for(*id_syms)
+          [*id_syms].map {|id_sym| #{column_name}_mapping.invert[id_sym] }
+        end
+
         def #{column_name}
           self.class.#{column_name}_mapping[self.#{column_id}]
         end
@@ -50,6 +57,20 @@ module FakeId
         def #{column_name}=(id_sym)
           self.#{column_id} = self.class.#{column_name}_mapping.invert[id_sym]
         end
+
+        named_scope :#{column_name}_in, lambda { |*id_syms|
+          {:conditions => ["#{column_id} IN (?)", #{column_id}s_for(*id_syms)]}
+        }
+        named_scope :#{column_name}_not_in, lambda { |*id_syms|
+          {:conditions => ["#{column_id} NOT IN (?)", #{column_id}s_for(*id_syms)]}
+        }
+
+        named_scope :#{column_name}_is, lambda { |id_sym|
+          {:conditions => ["#{column_id} = ?", #{column_name}_mapping.invert[id_sym]]}
+        }
+        named_scope :#{column_name}_is_not, lambda { |id_sym|
+          {:conditions => ["#{column_id} <> ?", #{column_name}_mapping.invert[id_sym]]}
+        }
       EVAL
 
     end
