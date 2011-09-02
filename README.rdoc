@@ -18,11 +18,6 @@ http://github.com/trliner/fake_id
   end
 
 
-=== Generated class methods
-
-  SecretAgentAlias.document_types
-  => [:drivers_license, :passport]
-
 === Generated instance methods
 
   alias = SecretAgentAlias.new(:document_type_id = 1)
@@ -32,3 +27,26 @@ http://github.com/trliner/fake_id
   alias.document_type = :passport
   alias.document_type
   => :passport
+
+  alias.passport?
+  alias.passport
+  => true
+
+  alias.drivers_license?
+  alias.drivers_license
+  => false
+
+
+=== Generated class methods
+
+  SecretAgentAlias.document_types
+  => [:drivers_license, :passport]
+
+  SecretAgentAlias.document_type_mappings
+  => {1=>:drivers_license, 2=>:passport}
+
+  SecretAgentAlias.lookup_document_type(1)
+  => :drivers_license
+
+  SecretAgentAlias.lookup_document_type(:passport)
+  => 1

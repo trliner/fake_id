@@ -8,6 +8,7 @@ module FakeId
 
     def fake_ids_for(column_name, id_mapping)
       column_id = (column_name.to_s + "_id").to_sym
+      column_name_plural = column_name.to_s.pluralize
 
       # mappings are stored in a class level hash
       class_inheritable_hash :fake_id_mappings
@@ -16,19 +17,38 @@ module FakeId
 
       id_mapping.each do |name, id|
         fake_id_mappings[column_name][id] = name
+
+        class_eval <<-EVAL
+          def #{name}?
+            self.#{column_id} == id
+          end
+          alias :#{name} :#{name}?
+        EVAL
       end
 
       class_eval <<-EVAL
+        def self.#{column_name}_mapping
+          self.fake_id_mappings[:#{column_name}]
+        end
+
+        def self.#{column_name_plural}
+          #{column_name}_mapping.values
+        end
+
+        def self.lookup_#{column_name}(key)
+          if key.to_sym == key
+            #{column_name}_mapping.invert[key]
+          else
+            #{column_name}_mapping[key.to_i]
+          end
+        end
+
         def #{column_name}
-          self.class.fake_id_mappings[:#{column_name}][self.#{column_id}]
+          self.class.#{column_name}_mapping[self.#{column_id}]
         end
 
         def #{column_name}=(id_sym)
-          self.#{column_id} = self.class.fake_id_mappings[:#{column_name}].invert[id_sym]
-        end
-
-        def self.#{column_name.to_s.pluralize}
-          self.fake_id_mappings[:#{column_name}].values
+          self.#{column_id} = self.class.#{column_name}_mapping.invert[id_sym]
         end
       EVAL
 
