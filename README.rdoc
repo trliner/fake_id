@@ -1,0 +1,29 @@
+= FakeId
+
+http://github.com/trliner/fake_id
+
+== Usage
+
+=== Defining fake ids
+
+  class SecretAgentAlias
+    include FakeId
+
+    attr_accessor :document_type_id
+
+    fake_ids_for :document_type, {
+      :drivers_license => 1,
+      :passport => 2
+    }
+  end
+
+
+=== Generated instance methods
+
+  alias_1 = Alias.new(:document_type_id = 1)
+  alias_1.document_type
+  => :drivers_license
+
+  alias_2 = Alias.new(:document_type_id = 2)
+  alias_2.document_type
+  => :passport
